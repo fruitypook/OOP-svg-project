@@ -14,6 +14,13 @@ int greatestCommonDivisor(int n1, int n2) {
     return a;
 }
 
+struct RGBColor {
+    int r, g, b;
+};
+
+// TODO: hex --> rgb conversion (for serialization)
+// TODO: word <-> rgb conversion (for de-/serialization)
+
 // {0,0} is top left corner
 struct Point {
     unsigned x, y;
@@ -34,7 +41,9 @@ constexpr double eps = 1e-6;
 
 class Shape {
    public:
-    Shape(const Point& p) : anchor(p) {}
+    Shape(const Point& p, const RGBColor& _fillColor = {0, 0, 0},
+          const RGBColor& _borderColor = {0, 0, 0})
+        : anchor(p), fillColor(_fillColor), borderColor(_borderColor) {}
     Shape(const Shape& o) = default;
 
     virtual double perimeter() const = 0;
@@ -47,6 +56,7 @@ class Shape {
 
    protected:
     Point anchor;
+    RGBColor fillColor, borderColor;
 };
 
 // anchor is one end of line
@@ -71,16 +81,19 @@ class Line : public Shape {
     double area() const override { return 0; }
     bool isWithin(const Point& p) const override { return (*this)(p) == 0; }
     void print() const override {
-        std::cout << eq.a << "x";
+        std::cout << "line: " << eq.a << "x";
         if (eq.b >= 0) std::cout << "+";
         std::cout << eq.b << "y";
         if (eq.c >= 0) std::cout << "+";
-        std::cout << eq.c << std::endl;
+        std::cout << eq.c  //
+                  << " color: " << borderColor.r << ',' << borderColor.g << ','
+                  << borderColor.b << std::endl;
     }
     void serialize(std::ostream& os = std::cout) const override {
-        // ex.: <line x1="0" y1="80" x2="100" y2="20" stroke="black" />
+        // ex.: <line x1="0" y1="80" x2="100" y2="20" stroke="rgb(255,0,0)" />
         os << "<line x1=\"" << anchor.x << "\" y1=\"" << anchor.y << "\" x2=\""
-           << end.x << "\" y2=\"" << end.y << "\" />";
+           << end.x << "\" y2=\"" << end.y << "\" stroke=\"rgb(" << borderColor.r
+           << ',' << borderColor.g << ',' << borderColor.b << ")\" />";
     }
 
    private:
