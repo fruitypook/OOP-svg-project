@@ -1,4 +1,5 @@
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -42,6 +43,7 @@ class Shape {
     virtual bool isWithin(const Point& p) const = 0;
 
     virtual void print() const = 0;
+    virtual void serialize(std::ostream& os = std::cout) const = 0;
 
    protected:
     Point anchor;
@@ -53,6 +55,7 @@ class Line : public Shape {
     Line(const Point& p1, const Point& p2) : Shape(p1), end(p2) {
         if (p1 == p2) {
             std::cerr << "line from one point created!";
+            eq = {0, 0, 0};
         } else {
             deriveLinePolynomialFromPoints(p1, p2, eq.a, eq.b, eq.c);
         }
@@ -72,7 +75,12 @@ class Line : public Shape {
         if (eq.b >= 0) std::cout << "+";
         std::cout << eq.b << "y";
         if (eq.c >= 0) std::cout << "+";
-        std::cout << eq.c;
+        std::cout << eq.c << std::endl;
+    }
+    void serialize(std::ostream& os = std::cout) const override {
+        // ex.: <line x1="0" y1="80" x2="100" y2="20" stroke="black" />
+        os << "<line x1=\"" << anchor.x << "\" y1=\"" << anchor.y << "\" x2=\""
+           << end.x << "\" y2=\"" << end.y << "\" />";
     }
 
    private:
@@ -130,6 +138,7 @@ int main() {
     std::cout << "hai!" << std::endl;
     // std::cout << dist({0, 0}, {4, 4}) << std::endl;
     // std::cout << greatestCommonDivisor(16, 16) << std::endl;
-    // Line l({1, 2}, {5, 4});
-    // l.print();
+    Line l({1, 2}, {5, 4});
+    l.print();
+    l.serialize();
 }
