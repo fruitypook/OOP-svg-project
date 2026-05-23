@@ -54,12 +54,13 @@ class Shape {
           const RGBColor& _strokeColor = {0, 0, 0})
         : anchor(p), fillColor(_fillColor), strokeColor(_strokeColor) {}
     Shape(const Shape& o) = default;
+    virtual Shape* clone() const = 0;
 
     virtual double perimeter() const = 0;
     virtual double area() const = 0;
     virtual bool contains(const Point& p) const = 0;
     // TODO: this method for later :)
-    // virtual bool isWithin(const Point& p) const = 0;
+    // virtual bool isWithin(...shape?...) const = 0;
     virtual void print() const = 0;
     virtual void serialize(std::ostream& os = std::cout) const = 0;
     virtual void translate(const int dx, const int dy) = 0;
@@ -89,6 +90,7 @@ class Line : public Shape {
         swap(copy);
         return *this;
     }
+    Line* clone() const override { return new Line(*this); }
 
     double perimeter() const override { return dist(anchor, end); }
     double area() const override { return 0; }
@@ -182,6 +184,7 @@ class Rectangle : public Shape {
         swap(copy);
         return *this;
     }
+    Rectangle* clone() const override { return new Rectangle(*this); }
 
     double perimeter() const override { return 2 * (width + height); }
     double area() const override { return width * height; }
@@ -228,6 +231,7 @@ class Circle : public Shape {
         swap(copy);
         return *this;
     }
+    Circle* clone() const override { return new Circle(*this); }
 
     double perimeter() const override { return 2 * M_PI * radius; }
     double area() const override { return M_PI * M_PI * radius; }
@@ -237,7 +241,7 @@ class Circle : public Shape {
     void print() const override {
         std::cout << "circle: " << anchor.x << ' ' << anchor.y  //
                   << ' ' << radius << ' '                       //
-                  << fillColor << strokeColor << std::endl;
+                  << fillColor << ' ' << strokeColor << std::endl;
     }
     void serialize(std::ostream& os = std::cout) const override {
         // ex.: <circle cx="5" cy="5" r="10" fill="blue" />
@@ -261,26 +265,102 @@ class Circle : public Shape {
 class Group : public Shape {
    public:
     Group() : shapes(nullptr), size(0), cap(0) {}
-    Group(const Group& o) : shapes(new Shape*[o.cap]), size(o.size), cap(o.cap) {}
+    Group(const Group& o) : shapes(new Shape*[o.cap]), size(o.size), cap(o.cap) {
+        for (size_t i = 0; i < size; ++i) shapes[i] = o.shapes[i]->clone();
+    }
+    Group* clone() const override { return new Group(*this); }
+    ~Group() {
+        for (Shape* s : *this) {
+            delete s;
+        }
+    }
 
-    // TODO: these methods
-    double perimeter() const override {}
-    double area() const override {}
-    bool contains(const Point& p) const override {}
-    void print() const override {}
-    void serialize(std::ostream& os = std::cout) const override {}
-    void translate(const int dx, const int dy) override {}
-    Group& addShape(const Shape* s) {}
-    void erase(size_t idx) {}
+    class Iterator {
+       public:
+        // Iterator() : curr(nullptr) {}
+        Iterator(size_t _curr, Shape** _arr) : curr(_curr), arr(_arr) {}
 
-    // TODO: iterator!!!
+        Iterator& operator++() {
+            curr++;
+            return *this;
+        }
+        Shape* operator*() { return arr[curr]; }
+        // const Shape& operator*() const { return arr[curr]; }
+        bool operator!=(const Iterator& o) const {
+            return curr != o.curr || arr != o.arr;
+        }
+        // bool operator==(const Iterator& o) const { return !(*this != o); }
+
+       private:
+        size_t curr;
+        Shape** arr;
+    };
+    Iterator begin() const { return Iterator(0, shapes); }
+    Iterator end() const { return Iterator(size, shapes); }
+
+    double perimeter() const override {
+        double res = 0;
+        for (Shape* s : *this) res += s->perimeter();
+        return res;
+    }
+    double area() const override {
+        double res = 0;
+        for (Shape* s : *this) res += s->area();
+        return res;
+    }
+    bool contains(const Point& p) const override {
+        for (Shape* s : *this)
+            if (s->contains(p)) return true;
+        return false;
+    }
+    void print() const override {
+        std::cout << "Group: " << std::endl;
+        if (size == 0) {
+            std::cerr << "empty group printed!" << std::endl;
+            return;
+        }
+        unsigned i = 1;
+        for (Shape* s : *this) {
+            std::cout << i++ << ". ";
+            s->print();
+        }
+        std::cout << std::endl;
+    }
+    void serialize(std::ostream& os = std::cout) const override {
+        os << "<g>" << std::endl;
+        for (Shape* s : *this) {
+            for (int i = 0; i < 2; ++i) std::cout << ' ';
+            s->serialize(os);
+        }
+        os << "</g>" << std::endl;
+    }
+    void translate(const int dx, const int dy) override {
+        for (Shape* s : *this) s->translate(dx, dy);
+    }
+    Group& addShape(const Shape* s) {
+        if (size == cap) resize();
+        shapes[size++] = s->clone();
+        return *this;
+    }
+    void erase() {
+        delete[] shapes;
+        shapes = nullptr;
+        size = cap = 0;
+    }
 
    private:
     Shape** shapes;
     size_t size, cap;
     void resize() {
         size_t newCap = (cap == 0 ? 1 : cap * 2);
-        // TODO: move semantics!
+        Shape** newArr = new Shape*[newCap];
+        for (size_t i = 0; i < size; ++i) {
+            newArr[i] = shapes[i];
+            shapes[i] = nullptr;
+        }
+        delete shapes;
+        shapes = newArr;
+        cap = newCap;
     }
 };
 
@@ -289,25 +369,40 @@ int main() {
     // std::cout << dist({0, 0}, {4, 4}) << std::endl;
     // std::cout << greatestCommonDivisor(16, 16) << std::endl;
     Line* l = new Line({1, 2}, {5, 4});
-    l->print();
-    l->serialize();
+    // l->print();
+    // l->serialize();
 
     Rectangle* r = new Rectangle({2, 1}, 10, 5);
-    r->print();
-    r->serialize();
+    // r->print();
+    // r->serialize();
 
     Circle* c = new Circle({3, 5}, 6);
-    c->print();
-    c->serialize();
+    // c->print();
+    // c->serialize();
 
-    l->translate(10, 10);
-    l->print();
-    r->translate(10, 10);
-    r->print();
-    c->translate(10, 10);
-    c->print();
+    // l->translate(10, 10), l->print();
+    // r->translate(10, 10), r->print();
+    // c->translate(10, 10), c->print();
+
+    Group* g = new Group;
+    g->addShape(l);
+    g->addShape(r);
+    // g->print();
+
+    Group* g2 = new Group;
+    g2->addShape(c);
+    g2->addShape(g);
+    g2->print();
+    // std::cout << g->perimeter() << ' ' << g->area() << std::endl;
+    // std::cout << g->contains({4, 6}) << g->contains({40, 6}) << std::endl;
+    // g->serialize();
+    // g->translate(10, 10);
+    // g->erase();
+    // g->print();
 
     delete l;
     delete r;
     delete c;
+    delete g;
+    delete g2;
 }
