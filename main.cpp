@@ -14,11 +14,10 @@ int greatestCommonDivisor(int n1, int n2) {
     }
     return a;
 }
-bool isBetween(const unsigned val, const unsigned rangeEnd1,
-               const unsigned rangeEnd2) {
+bool isBetween(const unsigned val, const unsigned rangeEnd1, const unsigned rangeEnd2) {
     unsigned left = std::min(rangeEnd1, rangeEnd2),  //
         right = std::max(rangeEnd1, rangeEnd2);
-    return left <= val && val >= right;
+    return left <= val && val <= right;
 }
 
 // TODO: hex --> rgb conversion (for serialization)
@@ -59,8 +58,10 @@ class Shape {
     virtual double perimeter() const = 0;
     virtual double area() const = 0;
     virtual bool contains(const Point& p) const = 0;
-    // TODO: this method for later :)
-    // virtual bool isWithin(...shape?...) const = 0;
+    virtual bool isOverlappedBy(const Shape& container) const = 0;
+    virtual void isWithin(const Shape& container) const {
+        if (isOverlappedBy(container)) print();
+    }
     virtual void print() const = 0;
     virtual void serialize(std::ostream& os = std::cout) const = 0;
     virtual void translate(const int dx, const int dy) = 0;
@@ -98,6 +99,11 @@ class Line : public Shape {
         return (*this)(p) == 0 &&  //
                isBetween(p.x, anchor.x, end.x) && isBetween(p.y, anchor.y, end.y);
     }
+    bool isOverlappedBy(const Shape& container) const override {
+        // both ends of a line being inside another shape means the entire line is
+        // inside as this doesn't support concave shapes.
+        return container.contains(anchor) && container.contains(end);
+    }
     void print() const override {
         std::cout << "line: "                                                     //
                   << anchor.x << ' ' << anchor.y << ' ' << end.x << ' ' << end.y  //
@@ -127,8 +133,8 @@ class Line : public Shape {
                                         int& a, int& b, int& c) {
         // line is colinear to vector (p2.x - p1.x ; p2.y - p1.y)
         // colinear vector has coordinates (B;-A)
-        eq.a = p1.y - p2.y;
-        eq.b = p2.x - p1.x;
+        eq.a = (int)p1.y - (int)p2.y;
+        eq.b = (int)p2.x - (int)p1.x;
         // C is such that A * p1.x + B * p1.y + C = 0
         eq.c = -(eq.a * p1.x + eq.b * p1.y);
         // now to remove common factors if possible:
@@ -167,12 +173,11 @@ class Rectangle : public Shape {
         }
         anchor.x = std::min(p1.x, p2.x);
         anchor.y = std::max(p1.y, p2.y);
-        width = std::abs((int)(p1.x - p2.x));
-        height = std::abs((int)(p1.y - p2.y));
+        width = std::abs((int)p1.x - (int)p2.x);
+        height = std::abs((int)p1.y - (int)p2.y);
     }
     Rectangle(const Point& p, const unsigned wid, const unsigned hei,
-              const RGBColor& fillCol = {0, 0, 0},
-              const RGBColor& strokeCol = {0, 0, 0})
+              const RGBColor& fillCol = {0, 0, 0}, const RGBColor& strokeCol = {0, 0, 0})
         : Shape(p, fillCol, strokeCol), width(wid), height(hei) {
         if (width == 0 || height == 0) {
             std::cerr << "rectangle with width or height 0 created!" << std::endl;
@@ -190,7 +195,15 @@ class Rectangle : public Shape {
     double area() const override { return width * height; }
     bool contains(const Point& p) const override {
         return isBetween(p.x, anchor.x, anchor.x + width) &&
-               isBetween(p.y, anchor.y, anchor.y - height);
+               isBetween(p.y, anchor.y, (anchor.y < height ? 0 : anchor.y - height));
+    }
+    bool isOverlappedBy(const Shape& container) const override {
+        Point bottomRight = {anchor.x + width, anchor.y},
+              topLeft = {anchor.x, (anchor.y < height ? 0 : anchor.y - height)},
+              topRight = {anchor.x + width, (anchor.y < height ? 0 : anchor.y - height)};
+
+        return container.contains(anchor) && container.contains(bottomRight) &&
+               container.contains(topLeft) && container.contains(topRight);
     }
     void print() const override {
         std::cout << "rectangle: "                                                 //
@@ -201,8 +214,8 @@ class Rectangle : public Shape {
         // ex.:   <rect x="5" y="5" width="10" height="10" fill="green" />
         os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y   //
            << "\" width=\"" << width << "\" height=\"" << height  //
-           << "\" fill=\"rgb(" << fillColor.r << ',' << fillColor.g << ','
-           << fillColor.b << ')'  //
+           << "\" fill=\"rgb(" << fillColor.r << ',' << fillColor.g << ',' << fillColor.b
+           << ')'  //
            << "\" stroke=\"rgb(" << strokeColor.r << ',' << strokeColor.g << ','
            << strokeColor.b << ")\" />" << std::endl;
     }
@@ -238,6 +251,15 @@ class Circle : public Shape {
     bool contains(const Point& p) const override {
         return dist(p, anchor) - radius <= eps;
     }
+    bool isOverlappedBy(const Shape& container) const override {
+        // checking four corners of the circle
+        Point right = {anchor.x + radius, anchor.y},
+              top = {anchor.x, (anchor.y < radius ? 0 : anchor.y - radius)},
+              left = {anchor.x < radius ? 0 : anchor.x - radius, anchor.y},
+              bottom = {anchor.x, anchor.y + radius};
+        return container.contains(right) && container.contains(top) &&
+               container.contains(left) && container.contains(bottom);
+    }
     void print() const override {
         std::cout << "circle: " << anchor.x << ' ' << anchor.y  //
                   << ' ' << radius << ' '                       //
@@ -270,9 +292,7 @@ class Group : public Shape {
     }
     Group* clone() const override { return new Group(*this); }
     ~Group() {
-        for (Shape* s : *this) {
-            delete s;
-        }
+        for (Shape* s : *this) delete s;
     }
 
     class Iterator {
@@ -312,6 +332,15 @@ class Group : public Shape {
         for (Shape* s : *this)
             if (s->contains(p)) return true;
         return false;
+    }
+    bool isOverlappedBy(const Shape& container) const override {
+        for (Shape* s : *this) {
+            if (!(s->isOverlappedBy(container))) return false;
+        }
+        return true;
+    }
+    void isWithin(const Shape& container) const override {
+        for (Shape* s : *this) s->isWithin(container);
     }
     void print() const override {
         std::cout << "Group: " << std::endl;
@@ -399,6 +428,8 @@ int main() {
     // g->translate(10, 10);
     // g->erase();
     // g->print();
+
+    g2->isWithin(Rectangle({0, 1000}, 1000, 1000));
 
     delete l;
     delete r;
