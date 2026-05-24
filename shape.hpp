@@ -4,22 +4,18 @@
 
 class Shape {
    public:
-    Shape(const Point& p, const RGBColor& _fillColor = {0, 0, 0},
-          const RGBColor& _strokeColor = {0, 0, 0})
-        : anchor(p), fillColor(_fillColor), strokeColor(_strokeColor) {}
-    Shape(const Shape& o) = default;
+    Shape(const Point&, const RGBColor&, const RGBColor&);
+    Shape(const Shape&);
     virtual Shape* clone() const = 0;
 
     virtual double perimeter() const = 0;
     virtual double area() const = 0;
-    virtual bool contains(const Point& p) const = 0;
-    virtual bool isOverlappedBy(const Shape& container) const = 0;
-    virtual void isWithin(const Shape& container) const {
-        if (isOverlappedBy(container)) print();
-    }
+    virtual bool contains(const Point&) const = 0;
+    virtual bool isOverlappedBy(const Shape&) const = 0;
+    virtual void isWithin(const Shape&) const;
     virtual void print() const = 0;
-    virtual void serialize(std::ostream& os = std::cout) const = 0;
-    virtual void translate(const int dx, const int dy) = 0;
+    virtual void serialize(std::ostream&) const = 0;
+    virtual void translate(const int, const int) = 0;
 
    protected:
     Shape() : anchor({0, 0}), fillColor({0, 0, 0}), strokeColor({0, 0, 0}) {}
