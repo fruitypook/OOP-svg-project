@@ -1,8 +1,7 @@
 #include "rectangle.hpp"
 
-Rectangle::Rectangle(const Point& p1, const Point& p2,
-                     const RGBColor& fillCol = {0, 0, 0},
-                     const RGBColor& strokeCol = {0, 0, 0})
+Rectangle::Rectangle(const Point& p1, const Point& p2,  //
+                     const RGBColor& fillCol, const RGBColor& strokeCol)
     : Shape(p1, fillCol, strokeCol) {
     if (p1 == p2) {
         std::cerr << "rectangle from one point created!" << std::endl;
@@ -16,8 +15,7 @@ Rectangle::Rectangle(const Point& p1, const Point& p2,
     height = std::abs((int)p1.y - (int)p2.y);
 }
 Rectangle::Rectangle(const Point& p, const unsigned wid, const unsigned hei,
-                     const RGBColor& fillCol = {0, 0, 0},
-                     const RGBColor& strokeCol = {0, 0, 0})
+                     const RGBColor& fillCol, const RGBColor& strokeCol)
     : Shape(p, fillCol, strokeCol), width(wid), height(hei) {
     if (width == 0 || height == 0) {
         std::cerr << "rectangle with width or height 0 created!" << std::endl;
@@ -50,7 +48,7 @@ void Rectangle::print() const {
               << anchor.x << ' ' << anchor.y << ' ' << width << ' ' << height  //
               << ' ' << fillColor << ' ' << strokeColor << std::endl;
 }
-void Rectangle::serialize(std::ostream& os = std::cout) const {
+void Rectangle::serialize(std::ostream& os) const {
     // ex.:   <rect x="5" y="5" width="10" height="10" fill="green" />
     os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y   //
        << "\" width=\"" << width << "\" height=\"" << height  //

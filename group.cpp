@@ -59,7 +59,7 @@ void Group::print() const {
     }
     std::cout << std::endl;
 }
-void Group::serialize(std::ostream& os = std::cout) const {
+void Group::serialize(std::ostream& os) const {
     os << "<g>" << std::endl;
     for (Shape* s : *this) {
         for (int i = 0; i < 2; ++i) std::cout << ' ';

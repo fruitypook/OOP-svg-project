@@ -1,6 +1,6 @@
 #include "line.hpp"
 
-Line::Line(const Point& p1, const Point& p2, const RGBColor& strokeCol = {0, 0, 0})
+Line::Line(const Point& p1, const Point& p2, const RGBColor& strokeCol)
     : Shape(p1, strokeCol), end(p2) {
     if (p1 == p2) {
         std::cerr << "line from one point created!" << std::endl;
@@ -34,7 +34,7 @@ void Line::print() const {
               << anchor.x << ' ' << anchor.y << ' ' << end.x << ' ' << end.y  //
               << ' ' << strokeColor << std::endl;
 }
-void Line::serialize(std::ostream& os = std::cout) const {
+void Line::serialize(std::ostream& os) const {
     // ex.: <line x1="0" y1="80" x2="100" y2="20" stroke="rgb(255,0,0)" />
     os << "<line x1=\"" << anchor.x << "\" y1=\"" << anchor.y  //
        << "\" x2=\"" << end.x << "\" y2=\"" << end.y           //

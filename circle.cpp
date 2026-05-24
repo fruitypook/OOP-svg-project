@@ -1,7 +1,7 @@
 #include "circle.hpp"
 
-Circle::Circle(const Point& p, const unsigned r, const RGBColor& fillCol = {0, 0, 0},
-               const RGBColor& strokeCol = {0, 0, 0})
+Circle::Circle(const Point& p, const unsigned r, const RGBColor& fillCol,
+               const RGBColor& strokeCol)
     : Shape(p, fillCol, strokeCol), radius(r) {}
 Circle::Circle(const Circle& o) = default;
 Circle& Circle::operator=(const Circle& o) {
@@ -28,7 +28,7 @@ void Circle::print() const {
               << ' ' << radius << ' '                       //
               << fillColor << ' ' << strokeColor << std::endl;
 }
-void Circle::serialize(std::ostream& os = std::cout) const {
+void Circle::serialize(std::ostream& os) const {
     // ex.: <circle cx="5" cy="5" r="10" fill="blue" />
     os << "<circle cx=\"" << anchor.x << "\" cy=\"" << anchor.y  //
        << "\" r=\"" << radius                                    //

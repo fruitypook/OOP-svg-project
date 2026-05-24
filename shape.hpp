@@ -4,7 +4,7 @@
 
 class Shape {
    public:
-    Shape(const Point&, const RGBColor&, const RGBColor&);
+    Shape(const Point&, const RGBColor& = {0, 0, 0}, const RGBColor& = {0, 0, 0});
     Shape(const Shape&);
     virtual Shape* clone() const = 0;
 

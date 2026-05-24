@@ -7,7 +7,8 @@
 // anchor is centre
 class Circle : public Shape {
    public:
-    Circle(const Point&, const unsigned, const RGBColor&, const RGBColor&);
+    Circle(const Point&, const unsigned, const RGBColor& = {0, 0, 0},
+           const RGBColor& = {0, 0, 0});
     Circle(const Circle&);
     Circle& operator=(const Circle&);
     Circle* clone() const override;
@@ -17,7 +18,7 @@ class Circle : public Shape {
     bool contains(const Point&) const override;
     bool isOverlappedBy(const Shape&) const override;
     void print() const override;
-    void serialize(std::ostream&) const override;
+    void serialize(std::ostream& = std::cout) const override;
     void translate(const int, const int);
 
    private:

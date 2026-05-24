@@ -5,9 +5,10 @@
 // anchor is bottom left corner (min x, max y)
 class Rectangle : public Shape {
    public:
-    Rectangle(const Point&, const Point&, const RGBColor&, const RGBColor&);
-    Rectangle(const Point&, const unsigned, const unsigned, const RGBColor&,
-              const RGBColor&);
+    Rectangle(const Point&, const Point&, const RGBColor& = {0, 0, 0},
+              const RGBColor& = {0, 0, 0});
+    Rectangle(const Point&, const unsigned, const unsigned,  //
+              const RGBColor& = {0, 0, 0}, const RGBColor& = {0, 0, 0});
     Rectangle(const Rectangle&);
     Rectangle& operator=(const Rectangle&);
     Rectangle* clone() const override;
@@ -17,7 +18,7 @@ class Rectangle : public Shape {
     bool contains(const Point&) const override;
     bool isOverlappedBy(const Shape&) const override;
     void print() const override;
-    void serialize(std::ostream&) const override;
+    void serialize(std::ostream& = std::cout) const override;
     void translate(const int, const int);
 
    private:
