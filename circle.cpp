@@ -28,8 +28,9 @@ void Circle::print() const {
               << ' ' << radius << ' '                       //
               << fillColor << ' ' << strokeColor << std::endl;
 }
-void Circle::serialize(std::ostream& os) const {
+void Circle::serialize(std::ostream& os, unsigned nested) const {
     // ex.: <circle cx="5" cy="5" r="10" fill="blue" />
+    for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "<circle cx=\"" << anchor.x << "\" cy=\"" << anchor.y  //
        << "\" r=\"" << radius                                    //
        << "\" fill=\"" << fillColor << "\" stroke=\"" << strokeColor << "\" />"

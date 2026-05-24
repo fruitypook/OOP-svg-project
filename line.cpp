@@ -34,8 +34,9 @@ void Line::print() const {
               << anchor.x << ' ' << anchor.y << ' ' << end.x << ' ' << end.y  //
               << ' ' << strokeColor << std::endl;
 }
-void Line::serialize(std::ostream& os) const {
+void Line::serialize(std::ostream& os, unsigned nested) const {
     // ex.: <line x1="0" y1="80" x2="100" y2="20" stroke="rgb(255,0,0)" />
+    for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "<line x1=\"" << anchor.x << "\" y1=\"" << anchor.y  //
        << "\" x2=\"" << end.x << "\" y2=\"" << end.y           //
        << "\" stroke=\"rgb(" << strokeColor.r << ',' << strokeColor.g << ','

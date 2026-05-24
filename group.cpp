@@ -59,12 +59,11 @@ void Group::print() const {
     }
     std::cout << std::endl;
 }
-void Group::serialize(std::ostream& os) const {
+void Group::serialize(std::ostream& os, unsigned nested) const {
+    for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "<g>" << std::endl;
-    for (Shape* s : *this) {
-        for (int i = 0; i < 2; ++i) std::cout << ' ';
-        s->serialize(os);
-    }
+    for (Shape* s : *this) s->serialize(os, nested + 1);
+    for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "</g>" << std::endl;
 }
 void Group::translate(const int dx, const int dy) {

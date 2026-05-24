@@ -16,11 +16,11 @@ int main() {
     std::cout << "hai!" << std::endl;
     // std::cout << dist({0, 0}, {4, 4}) << std::endl;
     // std::cout << greatestCommonDivisor(16, 16) << std::endl;
-    Line* l = new Line({1, 2}, {5, 4});
+    Line* l = new Line({10, 20}, {55, 43});
     // l->print();
     // l->serialize();
 
-    Rectangle* r = new Rectangle({2, 1}, 10, 5);
+    Rectangle* r = new Rectangle({200, 100}, 100, 60);
     // r->print();
     // r->serialize();
 
@@ -40,7 +40,7 @@ int main() {
     Group* g2 = new Group;
     g2->addShape(c);
     g2->addShape(g);
-    g2->print();
+    // g2->print();
     // std::cout << g->perimeter() << ' ' << g->area() << std::endl;
     // std::cout << g->contains({4, 6}) << g->contains({40, 6}) << std::endl;
     // g->serialize();
@@ -48,7 +48,19 @@ int main() {
     // g->erase();
     // g->print();
 
-    g2->isWithin(Rectangle({0, 1000}, 1000, 1000));
+    // g2->isWithin(Rectangle({0, 1000}, 1000, 1000));
+
+    std::ofstream file("shapes.svg");
+    // <?xml version="1.0" standalone="no"?>
+    // <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+    //  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+    // <svg>
+    file << "<?xml version=\"1.0\" standalone=\"no\"?>" << "\n"              //
+         << "<!DOCTYPE svg PUBLIC \"-// W3C//DTD SVG 1.1//EN\""              //
+         << "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << "\n"  //
+         << "<svg>" << "\n";
+    g2->serialize(file, 1);
+    file << "</svg>";
 
     delete l;
     delete r;

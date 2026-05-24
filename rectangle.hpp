@@ -18,7 +18,7 @@ class Rectangle : public Shape {
     bool contains(const Point&) const override;
     bool isOverlappedBy(const Shape&) const override;
     void print() const override;
-    void serialize(std::ostream& = std::cout) const override;
+    void serialize(std::ostream& = std::cout, unsigned = 0) const override;
     void translate(const int, const int);
 
    private:

@@ -14,7 +14,7 @@ class Shape {
     virtual bool isOverlappedBy(const Shape&) const = 0;
     virtual void isWithin(const Shape&) const;
     virtual void print() const = 0;
-    virtual void serialize(std::ostream&) const = 0;
+    virtual void serialize(std::ostream&, unsigned = 0) const = 0;
     virtual void translate(const int, const int) = 0;
 
    protected:

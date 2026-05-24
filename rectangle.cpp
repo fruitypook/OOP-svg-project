@@ -48,8 +48,9 @@ void Rectangle::print() const {
               << anchor.x << ' ' << anchor.y << ' ' << width << ' ' << height  //
               << ' ' << fillColor << ' ' << strokeColor << std::endl;
 }
-void Rectangle::serialize(std::ostream& os) const {
+void Rectangle::serialize(std::ostream& os, unsigned nested) const {
     // ex.:   <rect x="5" y="5" width="10" height="10" fill="green" />
+    for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y   //
        << "\" width=\"" << width << "\" height=\"" << height  //
        << "\" fill=\"rgb(" << fillColor.r << ',' << fillColor.g << ',' << fillColor.b
