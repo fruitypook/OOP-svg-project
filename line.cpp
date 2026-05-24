@@ -1,7 +1,7 @@
 #include "line.hpp"
 
 Line::Line(const Point& p1, const Point& p2, const RGBColor& strokeCol)
-    : Shape(p1, strokeCol), end(p2) {
+    : Shape(p1, strokeCol, strokeCol), end(p2) {
     if (p1 == p2) {
         std::cerr << "line from one point created!" << std::endl;
         // line parallel to x axis : y = p1.y
