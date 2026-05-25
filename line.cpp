@@ -29,7 +29,7 @@ bool Line::isOverlappedBy(const Shape& container) const {
     // inside as this doesn't support concave shapes.
     return container.contains(anchor) && container.contains(end);
 }
-void Line::print() const {
+void Line::print(const unsigned, const unsigned) const {
     std::cout << "line: "                                                     //
               << anchor.x << ' ' << anchor.y << ' ' << end.x << ' ' << end.y  //
               << ' ' << strokeColor << std::endl;
@@ -39,8 +39,34 @@ void Line::serialize(std::ostream& os, unsigned nested) const {
     for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "<line x1=\"" << anchor.x << "\" y1=\"" << anchor.y  //
        << "\" x2=\"" << end.x << "\" y2=\"" << end.y           //
-       << "\" stroke=\"rgb(" << strokeColor.r << ',' << strokeColor.g << ','
-       << strokeColor.b << ")\" />" << std::endl;
+       << "\" stroke=\"" << strokeColor << "\" />" << std::endl;
+}
+void Line::deserialize(std::istream& is) {
+    // ex.: x1="0" y1="80" x2="100" y2="20" stroke="rgb(255,0,0)" />
+    char buffer[DeserializationBufferSize];
+    char* str = buffer;
+    is.getline(str, DeserializationBufferSize);
+
+    skipUntilNumber(str);
+    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    anchor.x = readUnsigned(str);
+    skipUntilNumber(str);
+    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    anchor.y = readUnsigned(str);
+
+    skipUntilNumber(str);
+    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    end.x = readUnsigned(str);
+    skipUntilNumber(str);
+    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    end.y = readUnsigned(str);
+
+    skipUntilNumber(str);
+    strokeColor.r = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.g = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.b = readUnsigned(str);
 }
 void Line::translate(const int dx, const int dy) {
     anchor.translate(dx, dy);

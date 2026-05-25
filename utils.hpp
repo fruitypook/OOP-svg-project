@@ -1,13 +1,18 @@
 #pragma once
+
 #include <cmath>
+#include <cstring>
 #include <iostream>
 
 constexpr double eps = 1e-6;
+constexpr int DeserializationBufferSize = 128;
 
 int greatestCommonDivisor(int, int);
 bool isBetween(const unsigned, const unsigned, const unsigned);
+void skipWhitespace(char*&);
+unsigned readUnsigned(char*&);
+void skipUntilNumber(char*&);
 
-// TODO: hex --> rgb conversion (for serialization)
 // TODO: word <-> rgb conversion (for de-/serialization)
 struct RGBColor {
     int r, g, b;

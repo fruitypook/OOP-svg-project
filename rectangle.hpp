@@ -17,8 +17,9 @@ class Rectangle : public Shape {
     double area() const override;
     bool contains(const Point&) const override;
     bool isOverlappedBy(const Shape&) const override;
-    void print() const override;
+    void print(const unsigned = 0, const unsigned = 0) const override;
     void serialize(std::ostream& = std::cout, unsigned = 0) const override;
+    void deserialize(std::istream& = std::cin) override;
     void translate(const int, const int);
 
    private:

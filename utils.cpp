@@ -14,6 +14,22 @@ bool isBetween(const unsigned val, const unsigned rangeEnd1, const unsigned rang
         max = std::max(rangeEnd1, rangeEnd2);
     return min <= val && val <= max;
 }
+void skipWhitespace(char*& str) {
+    while (*str <= ' ') ++str;
+}
+bool isNum(char c) { return '0' <= c && c <= '9'; }
+unsigned readUnsigned(char*& str) {
+    unsigned res = 0;
+    while (isNum(*str)) {
+        res *= 10;
+        res += (*str - '0');
+        ++str;
+    }
+    return res;
+}
+void skipUntilNumber(char*& str) {
+    while (!isNum(*str)) ++str;
+}
 
 std::ostream& operator<<(std::ostream& os, const RGBColor col) {
     return os << "rgb(" << col.r << ',' << col.g << ',' << col.b << ')';

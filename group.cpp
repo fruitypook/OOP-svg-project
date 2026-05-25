@@ -46,7 +46,7 @@ bool Group::isOverlappedBy(const Shape& container) const {
 void Group::isWithin(const Shape& container) const {
     for (Shape* s : *this) s->isWithin(container);
 }
-void Group::print() const {
+void Group::print(const unsigned nested, const unsigned countAbove) const {
     std::cout << "Group: " << std::endl;
     if (size == 0) {
         std::cerr << "empty group printed!" << std::endl;
@@ -54,10 +54,11 @@ void Group::print() const {
     }
     unsigned i = 1;
     for (Shape* s : *this) {
-        std::cout << i++ << ". ";
-        s->print();
+        for (int i = 0; i < nested * 2; ++i) std::cout << ' ';
+        std::cout << countAbove << '.' << i++ << ". ";
+        s->print(nested + 1);
     }
-    std::cout << std::endl;
+    // std::cout << std::endl;
 }
 void Group::serialize(std::ostream& os, unsigned nested) const {
     for (int i = 0; i < nested * 2; ++i) os << ' ';
@@ -65,6 +66,23 @@ void Group::serialize(std::ostream& os, unsigned nested) const {
     for (Shape* s : *this) s->serialize(os, nested + 1);
     for (int i = 0; i < nested * 2; ++i) os << ' ';
     os << "</g>" << std::endl;
+}
+void Group::deserialize(std::istream& is) {
+    char typeBuffer[20];
+    char* type = typeBuffer;
+    skipWhitespace(type);
+    is >> type;
+
+    while (strcmp(type, "</g>") != 0) {
+        Shape* shape = shapeFactory(type);
+        if (shape) {
+            shape->deserialize(is);
+            addShape(shape);
+            delete shape;
+        }
+        is >> type;
+        skipWhitespace(type);
+    }
 }
 void Group::translate(const int dx, const int dy) {
     for (Shape* s : *this) s->translate(dx, dy);
@@ -74,7 +92,7 @@ Group& Group::addShape(const Shape* s) {
     shapes[size++] = s->clone();
     return *this;
 }
-void Group::erase() {
+void Group::clear() {
     delete[] shapes;
     shapes = nullptr;
     size = cap = 0;

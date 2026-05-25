@@ -7,7 +7,7 @@ class Group : public Shape {
     Group();
     Group(const Group&);
     Group* clone() const override;
-    ~Group();
+    virtual ~Group();
 
     class Iterator {
        public:
@@ -29,13 +29,14 @@ class Group : public Shape {
     bool contains(const Point&) const override;
     bool isOverlappedBy(const Shape&) const override;
     void isWithin(const Shape&) const override;
-    void print() const override;
+    void print(const unsigned = 0, const unsigned = 0) const override;
     void serialize(std::ostream& = std::cout, unsigned = 0) const override;
+    void deserialize(std::istream& = std::cin) override;
     void translate(const int, const int) override;
     Group& addShape(const Shape*);
-    void erase();
+    void clear();
 
-   private:
+   protected:
     Shape** shapes;
     size_t size, cap;
     void resize();

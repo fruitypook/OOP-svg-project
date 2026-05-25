@@ -1,8 +1,11 @@
+#define _USE_MATH_DEFINES
 #include "circle.hpp"
 
 Circle::Circle(const Point& p, const unsigned r, const RGBColor& fillCol,
                const RGBColor& strokeCol)
-    : Shape(p, fillCol, strokeCol), radius(r) {}
+    : Shape(p, fillCol, strokeCol), radius(r) {
+    if (radius == 0) std::cerr << "circle with radius 0 created!";
+}
 Circle::Circle(const Circle& o) = default;
 Circle& Circle::operator=(const Circle& o) {
     Circle copy(o);
@@ -23,7 +26,7 @@ bool Circle::isOverlappedBy(const Shape& container) const {
     return container.contains(right) && container.contains(top) &&
            container.contains(left) && container.contains(bottom);
 }
-void Circle::print() const {
+void Circle::print(const unsigned, const unsigned) const {
     std::cout << "circle: " << anchor.x << ' ' << anchor.y  //
               << ' ' << radius << ' '                       //
               << fillColor << ' ' << strokeColor << std::endl;
@@ -36,6 +39,34 @@ void Circle::serialize(std::ostream& os, unsigned nested) const {
        << "\" fill=\"" << fillColor << "\" stroke=\"" << strokeColor << "\" />"
        << std::endl;
 }
+void Circle::deserialize(std::istream& is) {
+    // ex.: cx="5" cy="5" r="10" fill="blue" />
+    char buffer[DeserializationBufferSize];
+    char* str = buffer;
+    is.getline(str, DeserializationBufferSize);
+
+    skipUntilNumber(str);
+    anchor.x = readUnsigned(str);
+    skipUntilNumber(str);
+    anchor.y = readUnsigned(str);
+    skipUntilNumber(str);
+    radius = readUnsigned(str);
+
+    skipUntilNumber(str);
+    fillColor.r = readUnsigned(str);
+    skipUntilNumber(str);
+    fillColor.g = readUnsigned(str);
+    skipUntilNumber(str);
+    fillColor.b = readUnsigned(str);
+
+    skipUntilNumber(str);
+    strokeColor.r = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.g = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.b = readUnsigned(str);
+}
+
 void Circle::translate(const int dx, const int dy) { anchor.translate(dx, dy); }
 
 void Circle::swap(Circle& o) {

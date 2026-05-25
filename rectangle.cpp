@@ -43,7 +43,7 @@ bool Rectangle::isOverlappedBy(const Shape& container) const {
     return container.contains(anchor) && container.contains(bottomRight) &&
            container.contains(topLeft) && container.contains(topRight);
 }
-void Rectangle::print() const {
+void Rectangle::print(const unsigned, const unsigned) const {
     std::cout << "rectangle: "                                                 //
               << anchor.x << ' ' << anchor.y << ' ' << width << ' ' << height  //
               << ' ' << fillColor << ' ' << strokeColor << std::endl;
@@ -51,12 +51,40 @@ void Rectangle::print() const {
 void Rectangle::serialize(std::ostream& os, unsigned nested) const {
     // ex.:   <rect x="5" y="5" width="10" height="10" fill="green" />
     for (int i = 0; i < nested * 2; ++i) os << ' ';
-    os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y   //
-       << "\" width=\"" << width << "\" height=\"" << height  //
-       << "\" fill=\"rgb(" << fillColor.r << ',' << fillColor.g << ',' << fillColor.b
-       << ')'  //
-       << "\" stroke=\"rgb(" << strokeColor.r << ',' << strokeColor.g << ','
-       << strokeColor.b << ")\" />" << std::endl;
+    os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y                      //
+       << "\" width=\"" << width << "\" height=\"" << height                     //
+       << "\" fill=\"" << fillColor << "\" stroke=\"" << strokeColor << "\" />"  //
+       << std::endl;
+}
+void Rectangle::deserialize(std::istream& is) {
+    // x="5" y="5" width="10" height="10" fill="green" />
+    char buffer[DeserializationBufferSize];
+    char* str = buffer;
+    is.getline(str, DeserializationBufferSize);
+
+    skipUntilNumber(str);
+    anchor.x = readUnsigned(str);
+    skipUntilNumber(str);
+    anchor.y = readUnsigned(str);
+
+    skipUntilNumber(str);
+    width = readUnsigned(str);
+    skipUntilNumber(str);
+    height = readUnsigned(str);
+
+    skipUntilNumber(str);
+    fillColor.r = readUnsigned(str);
+    skipUntilNumber(str);
+    fillColor.g = readUnsigned(str);
+    skipUntilNumber(str);
+    fillColor.b = readUnsigned(str);
+
+    skipUntilNumber(str);
+    strokeColor.r = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.g = readUnsigned(str);
+    skipUntilNumber(str);
+    strokeColor.b = readUnsigned(str);
 }
 void Rectangle::translate(const int dx, const int dy) { anchor.translate(dx, dy); }
 
