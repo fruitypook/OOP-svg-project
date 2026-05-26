@@ -46,7 +46,7 @@ bool Group::isOverlappedBy(const Shape& container) const {
 void Group::isWithin(const Shape& container) const {
     for (Shape* s : *this) s->isWithin(container);
 }
-void Group::print(const unsigned nested, const unsigned countAbove) const {
+void Group::print(const unsigned nested, const std::vector<unsigned>& countAbove) const {
     std::cout << "Group: " << std::endl;
     if (size == 0) {
         std::cerr << "empty group printed!" << std::endl;
@@ -55,10 +55,17 @@ void Group::print(const unsigned nested, const unsigned countAbove) const {
     unsigned i = 1;
     for (Shape* s : *this) {
         for (int i = 0; i < nested * 2; ++i) std::cout << ' ';
-        std::cout << countAbove << '.' << i++ << ". ";
-        s->print(nested + 1);
+        if (!countAbove.empty()) {
+            for (unsigned num : countAbove) {
+                std::cout << num << '.';
+            }
+        }
+        std::cout << i << ". ";
+        std::vector<unsigned> newCount = countAbove;
+        newCount.push_back(i);  // adds a new layer to the numbering
+        s->print(nested + 1, newCount);
+        ++i;
     }
-    // std::cout << std::endl;
 }
 void Group::serialize(std::ostream& os, unsigned nested) const {
     for (int i = 0; i < nested * 2; ++i) os << ' ';

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 constexpr double eps = 1e-6;
 constexpr int DeserializationBufferSize = 128;
@@ -12,6 +13,8 @@ bool isBetween(const unsigned, const unsigned, const unsigned);
 void skipWhitespace(char*&);
 unsigned readUnsigned(char*&);
 void skipUntilNumber(char*&);
+int hasSubstr(char* str, const char* substr);
+void skipAfterSubstr(char*& str, const char* substr);
 
 // TODO: word <-> rgb conversion (for de-/serialization)
 struct RGBColor {

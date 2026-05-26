@@ -29,7 +29,7 @@ bool Line::isOverlappedBy(const Shape& container) const {
     // inside as this doesn't support concave shapes.
     return container.contains(anchor) && container.contains(end);
 }
-void Line::print(const unsigned, const unsigned) const {
+void Line::print(const unsigned, const std::vector<unsigned>&) const {
     std::cout << "line: "                                                     //
               << anchor.x << ' ' << anchor.y << ' ' << end.x << ' ' << end.y  //
               << ' ' << strokeColor << std::endl;
@@ -47,21 +47,17 @@ void Line::deserialize(std::istream& is) {
     char* str = buffer;
     is.getline(str, DeserializationBufferSize);
 
-    skipUntilNumber(str);
-    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    skipAfterSubstr(str, "x1=\"");
     anchor.x = readUnsigned(str);
-    skipUntilNumber(str);
-    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    skipAfterSubstr(str, "y1=\"");
     anchor.y = readUnsigned(str);
 
-    skipUntilNumber(str);
-    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    skipAfterSubstr(str, "x2=\"");
     end.x = readUnsigned(str);
-    skipUntilNumber(str);
-    skipUntilNumber(++str);  // because the format contains numbers for x1,x2,y1,y2
+    skipAfterSubstr(str, "y2=\"");
     end.y = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "stroke=\"rgb(");
     strokeColor.r = readUnsigned(str);
     skipUntilNumber(str);
     strokeColor.g = readUnsigned(str);

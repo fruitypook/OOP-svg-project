@@ -26,7 +26,7 @@ bool Circle::isOverlappedBy(const Shape& container) const {
     return container.contains(right) && container.contains(top) &&
            container.contains(left) && container.contains(bottom);
 }
-void Circle::print(const unsigned, const unsigned) const {
+void Circle::print(const unsigned, const std::vector<unsigned>&) const {
     std::cout << "circle: " << anchor.x << ' ' << anchor.y  //
               << ' ' << radius << ' '                       //
               << fillColor << ' ' << strokeColor << std::endl;
@@ -40,26 +40,26 @@ void Circle::serialize(std::ostream& os, unsigned nested) const {
        << std::endl;
 }
 void Circle::deserialize(std::istream& is) {
-    // ex.: cx="5" cy="5" r="10" fill="blue" />
+    // ex.: cx="5" cy="5" r="10" fill="rgb(0,0,0)" />
     char buffer[DeserializationBufferSize];
     char* str = buffer;
     is.getline(str, DeserializationBufferSize);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "cx=\"");
     anchor.x = readUnsigned(str);
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "cy=\"");
     anchor.y = readUnsigned(str);
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "r=\"");
     radius = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "fill=\"rgb(");
     fillColor.r = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.g = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.b = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "stroke=\"rgb(");
     strokeColor.r = readUnsigned(str);
     skipUntilNumber(str);
     strokeColor.g = readUnsigned(str);

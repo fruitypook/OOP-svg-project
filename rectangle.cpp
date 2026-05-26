@@ -43,7 +43,7 @@ bool Rectangle::isOverlappedBy(const Shape& container) const {
     return container.contains(anchor) && container.contains(bottomRight) &&
            container.contains(topLeft) && container.contains(topRight);
 }
-void Rectangle::print(const unsigned, const unsigned) const {
+void Rectangle::print(const unsigned, const std::vector<unsigned>&) const {
     std::cout << "rectangle: "                                                 //
               << anchor.x << ' ' << anchor.y << ' ' << width << ' ' << height  //
               << ' ' << fillColor << ' ' << strokeColor << std::endl;
@@ -57,29 +57,29 @@ void Rectangle::serialize(std::ostream& os, unsigned nested) const {
        << std::endl;
 }
 void Rectangle::deserialize(std::istream& is) {
-    // x="5" y="5" width="10" height="10" fill="green" />
+    // x="5" y="5" width="10" height="10" fill="rgb(0,100,0)" stroke="rgb(100,0,100)" />
     char buffer[DeserializationBufferSize];
     char* str = buffer;
     is.getline(str, DeserializationBufferSize);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "x=\"");
     anchor.x = readUnsigned(str);
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "y=\"");
     anchor.y = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "width=\"");
     width = readUnsigned(str);
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "height=\"");
     height = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "fill=\"(rgb");
     fillColor.r = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.g = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.b = readUnsigned(str);
 
-    skipUntilNumber(str);
+    skipAfterSubstr(str, "stroke=\"(rgb");
     strokeColor.r = readUnsigned(str);
     skipUntilNumber(str);
     strokeColor.g = readUnsigned(str);

@@ -55,20 +55,21 @@ void SVGFile::deserialize(std::istream&) {
             addShape(shape);
             delete shape;
         }
-
         file >> type;
         skipWhitespace(type);
     }
 }
-void SVGFile::print(const unsigned, const unsigned) const {
+void SVGFile::print(const unsigned, const std::vector<unsigned>&) const {
     if (size == 0) {
         std::cerr << "empty file printed!" << std::endl;
         return;
     }
     unsigned i = 1;
     for (Shape* s : *this) {
-        std::cout << i << ".";
-        s->print(1, i++);
+        std::cout << i << ". ";
+        std::vector<unsigned> v;
+        v.push_back(i);
+        s->print(1, v);
     }
     // std::cout << std::endl;
 }

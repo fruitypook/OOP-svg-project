@@ -12,7 +12,7 @@ class SVGFile : private Group {
     void deserialize(std::istream& = std::cin) override;
     using Group::addShape;  // making it public
 
-    void print(const unsigned = 0, const unsigned = 0) const override;
+    void print(const unsigned = 0, const std::vector<unsigned>& = {}) const override;
 
    private:
     char* filename;

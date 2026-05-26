@@ -30,6 +30,23 @@ unsigned readUnsigned(char*& str) {
 void skipUntilNumber(char*& str) {
     while (!isNum(*str)) ++str;
 }
+int hasSubstr(char* str, const char* substr) {
+    unsigned strlength = strlen(str), substrlength = strlen(substr);
+    if (strlength < substrlength ||
+        (strlength == substrlength && strcmp(str, substr) != 0))
+        return -1;
+    int idx = 0;
+    while (*(str + substrlength + idx) != 0) {
+        if (strncmp(str + idx, substr, substrlength) == 0) return idx;
+        ++idx;
+    }
+    return -1;
+}
+void skipAfterSubstr(char*& str, const char* substr) {
+    int substrIdx = hasSubstr(str, substr);
+    if (substrIdx == -1) return;
+    str += (substrIdx + strlen(substr));
+}
 
 std::ostream& operator<<(std::ostream& os, const RGBColor col) {
     return os << "rgb(" << col.r << ',' << col.g << ',' << col.b << ')';
