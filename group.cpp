@@ -4,9 +4,14 @@ Group::Group() : shapes(nullptr), size(0), cap(0) {}
 Group::Group(const Group& o) : shapes(new Shape*[o.cap]), size(o.size), cap(o.cap) {
     for (size_t i = 0; i < size; ++i) shapes[i] = o.shapes[i]->clone();
 }
+Group::Group(Group&& o)
+    : shapes(std::exchange(o.shapes, nullptr)), size(o.size), cap(o.cap) {
+    o.size = o.cap = 0;
+}
 Group* Group::clone() const { return new Group(*this); }
 Group::~Group() {
-    for (Shape* s : *this) delete s;
+    for (Shape* s : *this)  //
+        delete s;
 }
 
 Group::Iterator::Iterator(size_t _curr, Shape** _arr) : curr(_curr), arr(_arr) {}
@@ -54,7 +59,7 @@ void Group::print(const unsigned nested, const std::vector<unsigned>& countAbove
     }
     unsigned i = 1;
     for (Shape* s : *this) {
-        for (int i = 0; i < nested * 2; ++i) std::cout << ' ';
+        for (unsigned i = 0; i < nested * 2; ++i) std::cout << ' ';
         if (!countAbove.empty()) {
             for (unsigned num : countAbove) {
                 std::cout << num << '.';
@@ -68,10 +73,10 @@ void Group::print(const unsigned nested, const std::vector<unsigned>& countAbove
     }
 }
 void Group::serialize(std::ostream& os, unsigned nested) const {
-    for (int i = 0; i < nested * 2; ++i) os << ' ';
+    for (unsigned i = 0; i < nested * 2; ++i) os << ' ';
     os << "<g>" << std::endl;
     for (Shape* s : *this) s->serialize(os, nested + 1);
-    for (int i = 0; i < nested * 2; ++i) os << ' ';
+    for (unsigned i = 0; i < nested * 2; ++i) os << ' ';
     os << "</g>" << std::endl;
 }
 void Group::deserialize(std::istream& is) {
@@ -84,7 +89,7 @@ void Group::deserialize(std::istream& is) {
         Shape* shape = shapeFactory(type);
         if (shape) {
             shape->deserialize(is);
-            addShape(shape);
+            addShape(shape);  // TODO move semantics version
             delete shape;
         }
         is >> type;
@@ -112,7 +117,7 @@ void Group::resize() {
         newArr[i] = shapes[i];
         shapes[i] = nullptr;
     }
-    delete shapes;
+    delete[] shapes;
     shapes = newArr;
     cap = newCap;
 }

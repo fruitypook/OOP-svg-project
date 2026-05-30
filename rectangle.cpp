@@ -50,7 +50,7 @@ void Rectangle::print(const unsigned, const std::vector<unsigned>&) const {
 }
 void Rectangle::serialize(std::ostream& os, unsigned nested) const {
     // ex.:   <rect x="5" y="5" width="10" height="10" fill="green" />
-    for (int i = 0; i < nested * 2; ++i) os << ' ';
+    for (unsigned i = 0; i < nested * 2; ++i) os << ' ';
     os << "<rect x=\"" << anchor.x << "\" y=\"" << anchor.y                      //
        << "\" width=\"" << width << "\" height=\"" << height                     //
        << "\" fill=\"" << fillColor << "\" stroke=\"" << strokeColor << "\" />"  //
@@ -72,14 +72,14 @@ void Rectangle::deserialize(std::istream& is) {
     skipAfterSubstr(str, "height=\"");
     height = readUnsigned(str);
 
-    skipAfterSubstr(str, "fill=\"(rgb");
+    skipAfterSubstr(str, "fill=\"rgb(");
     fillColor.r = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.g = readUnsigned(str);
     skipUntilNumber(str);
     fillColor.b = readUnsigned(str);
 
-    skipAfterSubstr(str, "stroke=\"(rgb");
+    skipAfterSubstr(str, "stroke=\"rgb(");
     strokeColor.r = readUnsigned(str);
     skipUntilNumber(str);
     strokeColor.g = readUnsigned(str);

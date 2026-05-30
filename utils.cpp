@@ -31,12 +31,13 @@ void skipUntilNumber(char*& str) {
     while (!isNum(*str)) ++str;
 }
 int hasSubstr(char* str, const char* substr) {
+    if (!str || !substr) return -1;
     unsigned strlength = strlen(str), substrlength = strlen(substr);
     if (strlength < substrlength ||
         (strlength == substrlength && strcmp(str, substr) != 0))
         return -1;
     int idx = 0;
-    while (*(str + substrlength + idx) != 0) {
+    while (idx + substrlength <= strlength) {
         if (strncmp(str + idx, substr, substrlength) == 0) return idx;
         ++idx;
     }
@@ -46,6 +47,14 @@ void skipAfterSubstr(char*& str, const char* substr) {
     int substrIdx = hasSubstr(str, substr);
     if (substrIdx == -1) return;
     str += (substrIdx + strlen(substr));
+}
+bool isCapital(const char c) { return 'A' <= c && c <= 'Z'; }
+void toLowercase(char* str) {
+    if (!str) return;
+    while (*str != 0) {
+        if (isCapital(*str)) *str = (*str) + ('a' - 'A');
+        str++;
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const RGBColor col) {

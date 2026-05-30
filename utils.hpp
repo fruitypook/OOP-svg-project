@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstring>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 constexpr double eps = 1e-6;
@@ -13,8 +14,10 @@ bool isBetween(const unsigned, const unsigned, const unsigned);
 void skipWhitespace(char*&);
 unsigned readUnsigned(char*&);
 void skipUntilNumber(char*&);
-int hasSubstr(char* str, const char* substr);
-void skipAfterSubstr(char*& str, const char* substr);
+int hasSubstr(char*, const char*);
+void skipAfterSubstr(char*&, const char*);
+bool isCapital(const char);
+void toLowercase(char*);
 
 // TODO: word <-> rgb conversion (for de-/serialization)
 struct RGBColor {

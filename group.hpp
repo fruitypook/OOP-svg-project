@@ -7,7 +7,8 @@ class Group : public Shape {
     Group();
     Group(const Group&);
     Group* clone() const override;
-    virtual ~Group();
+    Group(Group&&);
+    ~Group() override;
 
     class Iterator {
        public:

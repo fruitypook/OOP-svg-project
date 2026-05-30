@@ -2,12 +2,19 @@
 
 #include <fstream>
 
-SVGFile::SVGFile(const char* _fn) : Group(), filename(new char[strlen(_fn)]) {
-    strcpy(filename, _fn);
+SVGFile::SVGFile(const char* fn) : Group(), filename(new char[strlen(fn)]) {
+    strcpy(filename, fn);
 }
-
-SVGFile::SVGFile(const SVGFile& o) : Group(o), filename(new char[strlen(o.filename)]) {
+SVGFile::SVGFile(const SVGFile& o)
+    : Group(o), filename(new char[strlen(o.filename) + 1]) {
     strcpy(filename, o.filename);
+}
+SVGFile::SVGFile(const SVGFile& o, const char* fn)  //
+    : SVGFile(o) {
+    delete[] filename;
+    filename = new char[strlen(fn) + 1];
+    strcpy(filename, fn);
+    // uses copy contructor ("delegating constructor") but edits filename after
 }
 SVGFile& SVGFile::operator=(const SVGFile& o) {
     SVGFile copy(o);
@@ -20,13 +27,10 @@ void SVGFile::swap(SVGFile& o) {
     std::swap(o.size, size);
     std::swap(o.cap, cap);
 }
-SVGFile::~SVGFile() {
-    for (Shape* s : *this) {
-        delete s;
-    }
-}
+SVGFile::~SVGFile() { delete[] filename; }
 
-void SVGFile::serialize(std::ostream&, unsigned) const {
+void SVGFile::serialize(std::ostream&, unsigned) const { serializeToFile(filename); }
+void SVGFile::serializeToFile(const char* filename) const {
     // <?xml version="1.0" standalone="no"?>
     // <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
     //  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -70,6 +74,18 @@ void SVGFile::print(const unsigned, const std::vector<unsigned>&) const {
         std::vector<unsigned> v;
         v.push_back(i);
         s->print(1, v);
+        i++;
     }
-    // std::cout << std::endl;
+}
+void SVGFile::removeShape(unsigned number) {
+    if (number > size || number == 0) {
+        std::cout << "there is no shape number " << number << "!" << std::endl;
+        return;
+    }
+    delete shapes[number - 1];
+    for (size_t i = number; i < size; ++i)  // pushes back
+        shapes[i - 1] = shapes[i];
+
+    shapes[(size--) - 1] = nullptr;
+    std::cout << "removed number " << number << "." << std::endl;
 }

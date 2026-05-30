@@ -7,6 +7,7 @@ class Shape {
     Shape(const Point&, const RGBColor& = {0, 0, 0}, const RGBColor& = {0, 0, 0});
     Shape(const Shape&);
     virtual Shape* clone() const = 0;
+    virtual ~Shape() = default;
 
     virtual double perimeter() const = 0;
     virtual double area() const = 0;

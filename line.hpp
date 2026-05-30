@@ -9,6 +9,7 @@ class Line : public Shape {
     Line(const Line&);
     Line& operator=(const Line&);
     Line* clone() const override;
+    ~Line() = default;
 
     double perimeter() const override;
     double area() const override;
@@ -17,7 +18,7 @@ class Line : public Shape {
     void print(const unsigned = 0, const std::vector<unsigned>& = {}) const override;
     void serialize(std::ostream& = std::cout, unsigned = 0) const override;
     void deserialize(std::istream& = std::cin) override;
-    void translate(const int, const int);
+    void translate(const int, const int) override;
 
    private:
     Point end;

@@ -12,6 +12,7 @@ class Rectangle : public Shape {
     Rectangle(const Rectangle&);
     Rectangle& operator=(const Rectangle&);
     Rectangle* clone() const override;
+    ~Rectangle() = default;
 
     double perimeter() const override;
     double area() const override;
@@ -20,7 +21,7 @@ class Rectangle : public Shape {
     void print(const unsigned = 0, const std::vector<unsigned>& = {}) const override;
     void serialize(std::ostream& = std::cout, unsigned = 0) const override;
     void deserialize(std::istream& = std::cin) override;
-    void translate(const int, const int);
+    void translate(const int, const int) override;
 
    private:
     unsigned width, height;
