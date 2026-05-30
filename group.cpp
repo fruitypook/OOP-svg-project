@@ -89,7 +89,7 @@ void Group::deserialize(std::istream& is) {
         Shape* shape = shapeFactory(type);
         if (shape) {
             shape->deserialize(is);
-            addShape(shape);  // TODO move semantics version
+            addShape(std::move(shape));
             delete shape;
         }
         is >> type;
@@ -100,8 +100,14 @@ void Group::translate(const int dx, const int dy) {
     for (Shape* s : *this) s->translate(dx, dy);
 }
 Group& Group::addShape(const Shape* s) {
-    if (size == cap) resize();
+    if (size >= cap) resize();
     shapes[size++] = s->clone();
+    return *this;
+}
+Group& Group::addShape(Shape*&& s) {  // receives an r-value reference to a shape pointer
+    if (size >= cap) resize();
+    shapes[size++] = s;
+    s = nullptr;
     return *this;
 }
 void Group::clear() {

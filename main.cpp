@@ -9,41 +9,6 @@
 #include "svgfile.hpp"
 #include "utils.hpp"
 
-void loadTestFile(SVGFile& f) {
-    Line* l = new Line({100, 10}, {70, 0}, {100, 0, 0});
-    Rectangle* r = new Rectangle({200, 100}, 150, 40, {0, 100, 0}, {100, 0, 100});
-    Circle* c = new Circle({50, 60}, 30, {100, 100, 0}, {0, 0, 100});
-
-    f.addShape(l), f.addShape(r), f.addShape(c);
-
-    Group* g1 = new Group();
-
-    Group* g2 = new Group();
-    g2->addShape(r).addShape(l);
-
-    g1->addShape(l);
-    g1->addShape(g2);
-    g1->addShape(c);
-
-    f.addShape(g1);
-
-    delete l;
-    delete r;
-    delete c;
-    delete g1;
-    delete g2;
-}
-
-void printHelpMsg() {
-    std::cout << "The following commands are supported:\n"
-              << "open <file>   \t opens <file> \n"
-              << "close         \t closes currently opened file \n"
-              << "save          \t saves the currently open file \n"
-              << "saveas <file> \t saves the currently open file in <file> \n"
-              << "help          \t prints this information exit exists the program \n"
-              << "exit          \t exits the program" << std::endl;
-}
-
 char* nextWord(char* src) {
     if (!src) return nullptr;
     while (*src != '\0' && *src != ' ') ++src;
@@ -62,21 +27,6 @@ void inputCommandAndArgs(char*& command, char*& arg, char* buffer) {
     arg = nextWord(command);
 }
 
-// int main() {
-//     std::cout << "hai!" << std::endl;
-
-//     SVGFile f("testshape.svg");
-//     f.deserialize();
-
-//     for (int i = 0; i < 80; ++i) std::cout << '-';
-//     std::cout << std::endl;
-
-//     f.print();
-
-//     for (int i = 0; i < 80; ++i) std::cout << '-';
-//     std::cout << std::endl;
-// }
-
 int main() {
     std::cout << "hai!" << std::endl;
 
@@ -90,9 +40,6 @@ int main() {
     do {
         std::cout << '>';
         inputCommandAndArgs(command, arg, buffer);
-
-        std::cout << "cmd:" << command << std::endl;
-        if (arg) std::cout << "arg:" << arg << std::endl;
 
         if (strcmp(command, "open") == 0) {
             if (!arg) {
@@ -112,9 +59,10 @@ int main() {
                 std::cout << "no file currently open to close!" << std::endl;
                 continue;
             }
+            const char* filename = currFile->getFilename();
             delete currFile;
             currFile = nullptr;
-            std::cout << arg << " closed." << std::endl;
+            std::cout << filename << " closed." << std::endl;
 
         } else if (strcmp(command, "save") == 0) {
             if (!currFile) {
@@ -122,7 +70,8 @@ int main() {
                 continue;
             }
             currFile->serialize();
-            std::cout << "successfully saved" << arg << "." << std::endl;
+            std::cout << "successfully saved " << currFile->getFilename() << "."
+                      << std::endl;
 
         } else if (strcmp(command, "saveas") == 0) {
             if (!arg) {
@@ -145,7 +94,6 @@ int main() {
             }
             currFile->print();
         } else if (strcmp(command, "create") == 0) {
-            std::cout << "CREATE" << std::endl;
             if (!arg) {
                 std::cout << "no shape details entered!" << std::endl;
                 continue;
@@ -154,7 +102,7 @@ int main() {
                 std::cout << "no file is open!" << std::endl;
                 continue;
             }
-            // create shape from arg details
+            // TODO: create shape from arg details
             // add to SVGFile using move semantics
         } else if (strcmp(command, "erase") == 0) {
             if (!arg) {
@@ -168,7 +116,6 @@ int main() {
             unsigned pos = readUnsigned(arg);
             currFile->removeShape(pos);
         } else if (strcmp(command, "translate") == 0) {
-            std::cout << "TRANS" << std::endl;
             if (!arg) {
                 std::cout << "no coordinates entered!" << std::endl;
                 continue;
@@ -177,9 +124,9 @@ int main() {
                 std::cout << "no file is open!" << std::endl;
                 continue;
             }
-            // enter dx dy arguments for translate function;
-            int dx, dy;
+            int dx = readInt(arg), dy = readInt(++arg);
             currFile->translate(dx, dy);
+            std::cout << "shapes translated by (" << dx << ',' << dy << ")" << std::endl;
         } else if (strcmp(command, "within") == 0) {
             std::cout << "WITHIN" << std::endl;
             if (!arg) {
@@ -190,7 +137,7 @@ int main() {
                 std::cout << "no file is open!" << std::endl;
                 continue;
             }
-            // create shape from arg
+            // TODO: create shape from arg
             // iterate file and use isWithin or whatever it's called
         } else if (strcmp(command, "group") == 0) {
             if (!arg) {
@@ -201,7 +148,7 @@ int main() {
                 std::cout << "no file is open!" << std::endl;
                 continue;
             }
-            // list numbers with space and make a new group containing said numbers
+            // TODO: list numbers and make a new group containing said numbers
             // appended to the end with move semantics
         } else if (strcmp(command, "exit") != 0) {
             std::cout << "unrecognized command: " << command << '!' << std::endl;
@@ -209,9 +156,8 @@ int main() {
 
     } while (strcmp(command, "exit") != 0);
 
-    delete currFile;
-
     std::cout << "exiting program..." << std::endl;
+    delete currFile;
 
     return 0;
 }

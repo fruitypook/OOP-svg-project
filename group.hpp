@@ -35,6 +35,7 @@ class Group : public Shape {
     void deserialize(std::istream& = std::cin) override;
     void translate(const int, const int) override;
     Group& addShape(const Shape*);
+    Group& addShape(Shape*&&);
     void clear();
 
    protected:

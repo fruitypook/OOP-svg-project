@@ -31,6 +31,7 @@ SVGFile::~SVGFile() { delete[] filename; }
 
 void SVGFile::serialize(std::ostream&, unsigned) const { serializeToFile(filename); }
 void SVGFile::serializeToFile(const char* filename) const {
+    // TODO: svg file header
     // <?xml version="1.0" standalone="no"?>
     // <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
     //  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -44,7 +45,7 @@ void SVGFile::deserialize(std::istream&) {
     clear();
     std::ifstream file(filename);
     if (file.peek() == std::istream::traits_type::eof()) {
-        std::cerr << "attempt to deserialize from an empty file!";
+        std::cerr << "attempted to deserialize from an empty file!";
         return;
     }
     char typeBuffer[20];
@@ -56,7 +57,7 @@ void SVGFile::deserialize(std::istream&) {
         Shape* shape = shapeFactory(type);
         if (shape) {
             shape->deserialize(file);
-            addShape(shape);
+            addShape(std::move(shape));
             delete shape;
         }
         file >> type;
@@ -77,6 +78,7 @@ void SVGFile::print(const unsigned, const std::vector<unsigned>&) const {
         i++;
     }
 }
+char* SVGFile::getFilename() const { return filename; }
 void SVGFile::removeShape(unsigned number) {
     if (number > size || number == 0) {
         std::cout << "there is no shape number " << number << "!" << std::endl;

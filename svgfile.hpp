@@ -8,7 +8,6 @@ class SVGFile : private Group {
     SVGFile& operator=(const SVGFile&);
     ~SVGFile();
 
-    // TODO: user commands here
     void serialize(std::ostream& = std::cout, unsigned = 0) const override;
     void serializeToFile(const char*) const;
     void deserialize(std::istream& = std::cin) override;
@@ -17,6 +16,7 @@ class SVGFile : private Group {
     void removeShape(unsigned number);
 
     void print(const unsigned = 0, const std::vector<unsigned>& = {}) const override;
+    char* getFilename() const;
 
    private:
     char* filename;

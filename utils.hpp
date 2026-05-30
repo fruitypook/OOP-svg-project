@@ -13,6 +13,7 @@ int greatestCommonDivisor(int, int);
 bool isBetween(const unsigned, const unsigned, const unsigned);
 void skipWhitespace(char*&);
 unsigned readUnsigned(char*&);
+int readInt(char*&);
 void skipUntilNumber(char*&);
 int hasSubstr(char*, const char*);
 void skipAfterSubstr(char*&, const char*);
@@ -34,3 +35,5 @@ bool operator==(const Point&, const Point&);
 bool operator!=(const Point&, const Point&);
 
 double dist(const Point& p1, const Point& p2);
+
+void printHelpMsg();
